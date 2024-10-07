@@ -72,11 +72,11 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let list_new:LinkedList<T> = LinkedList::new();
+        unsafe{
+            for()
         }
+        list_new
 	}
 }
 
