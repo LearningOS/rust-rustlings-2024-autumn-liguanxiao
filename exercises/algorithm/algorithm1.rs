@@ -2,19 +2,20 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
+use std::cmp::PartialOrd;
 
 #[derive(Debug)]
-struct Node<T> {
+struct Node<T:PartialOrd> {
     val: T,
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T:PartialOrd> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -23,19 +24,19 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T:PartialOrd> {
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T:PartialOrd> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:PartialOrd> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,18 +70,52 @@ impl<T> LinkedList<T> {
             },
         }
     }
+
+ 
+    pub fn merge_two_lists(
+        list1: Option<NonNull<Node<T>>>,
+        list2: Option<NonNull<Node<T>>>,
+    ) -> Option<NonNull<Node<T>>>
+    {
+        match (list1, list2) {
+            (None, None) => None,
+            (None, r) => r,
+            (l, None) => l,
+            (Some(mut l), Some(mut r)) => {
+                if unsafe { l.as_ref().val <= r.as_ref().val } {
+                    unsafe {
+                        l.as_mut().next = Self::merge_two_lists(l.as_mut().next, Some(r));
+                    }
+                    Some(l)
+                } else {
+                    unsafe {
+                        r.as_mut().next = Self::merge_two_lists(Some(l), r.as_mut().next);
+                    }
+                    Some(r)
+                }
+            }
+        }
+    }
+
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-        let list_new:LinkedList<T> = LinkedList::new();
         unsafe{
-            for()
+          let mut list_c = LinkedList::new();
+          list_c.length = list_a.length + list_b.length;
+          if (*list_a.end.unwrap().as_ptr()).val <= (*list_b.end.unwrap().as_ptr()).val {
+            list_c.end = list_b.end;
+          }else {
+            list_c.end = list_a.end;
+          }
+          list_c.start =Self::merge_two_lists(list_a.start,list_b.start);
+
+          list_c
         }
-        list_new
+        
 	}
 }
 
-impl<T> Display for LinkedList<T>
+impl<T:PartialOrd> Display for LinkedList<T>
 where
     T: Display,
 {
@@ -92,7 +127,7 @@ where
     }
 }
 
-impl<T> Display for Node<T>
+impl<T:PartialOrd> Display for Node<T>
 where
     T: Display,
 {
