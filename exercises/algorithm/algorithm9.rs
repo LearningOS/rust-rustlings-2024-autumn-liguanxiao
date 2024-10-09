@@ -1,8 +1,8 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,23 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        match self.items.get(self.count) {
+            None=>{
+                self.items.push(T::default());
+                self.items[self.count] = value;
+            },
+            _ => {
+                self.items[self.count] = value;
+            }
+        }
+        self.count += 1;
+        let mut index = self.count;
+        
+        while index >1  
+          && (self.comparator)(&self.items[index-1],&self.items[(index/2)-1]){
+            self.items.swap(index - 1, index / 2 - 1);
+            index = self.parent_idx(index);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +73,18 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        if self.right_child_idx(idx) > self.count {
+            return self.left_child_idx(idx);
+        }
+
+        if (self.comparator)(
+            &self.items[self.right_child_idx(idx) - 1],
+            &self.items[self.left_child_idx(idx) - 1],
+        ) {
+            self.right_child_idx(idx)
+        } else {
+            self.left_child_idx(idx)
+        }
     }
 }
 
@@ -85,7 +111,23 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        self.items.swap(0, self.count - 1);
+        let res = self.items.pop().unwrap();
+        self.count -= 1;
+        let mut index = 1;
+        while self.children_present(index) {
+            let child_index = self.smallest_child_idx(index);
+            if !(self.comparator)(&self.items[index - 1], &self.items[child_index - 1]) {
+                self.items.swap(index - 1, child_index - 1);
+                index = child_index;
+            } else {
+                break;
+            }
+        }
+        Some(res)
     }
 }
 
