@@ -2,7 +2,7 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
+
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -30,6 +30,16 @@ impl Graph for UndirectedGraph {
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (e1, e2, weight) = edge;
+        self.add_node(e1);
+        self.add_node(e2);
+        let mut g_hash = self.adjacency_table_mutable();
+        if let Some(vec) = g_hash.get_mut(e1){
+            vec.push((e2.to_string(),weight))
+        }
+        if let Some(vec) = g_hash.get_mut(e2){
+            vec.push((e1.to_string(),weight))
+        }
     }
 }
 pub trait Graph {
@@ -38,10 +48,19 @@ pub trait Graph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
-		true
+        let mut new_node:String = node.to_string();
+        let mut g_hash = self.adjacency_table_mutable();
+        if g_hash.contains_key(&new_node){
+           false
+        }else{
+            g_hash.insert(new_node,vec![]);
+            true
+        }
+		
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+       
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
@@ -63,6 +82,7 @@ pub trait Graph {
 mod test_undirected_graph {
     use super::Graph;
     use super::UndirectedGraph;
+
     #[test]
     fn test_add_edge() {
         let mut graph = UndirectedGraph::new();
